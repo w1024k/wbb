@@ -2,55 +2,67 @@
 
 import requests
 from lxml import etree
-import settings
+import scene_settings as settings
+import common
 import re
 
 
-def xc_scene():
-    domain = "http://you.ctrip.com"
-    nodes_path = "//div[@class='list_wide_mod2']//div[@class='list_mod2']"
-    name_path = ".//dt/a/text()"
-    address_path = ".//dd[@class='ellipsis']/text()"
-    score_path = ".//a[@class='score']/strong/text()"
-    comment_path = ".//a[@class='recomment']/text()"  # (2611条点评)
-    detail_url_path = ".//dt/a/@href"
-    rsp = requests.get(url=settings.SCENE_XC_URL, headers=settings.HEADER).text
+def xc_scene(url):
+    rsp = requests.get(url=url, headers=common.HEADER).text
     selector = etree.HTML(rsp)
-    nodes = selector.xpath(nodes_path)
+    nodes = selector.xpath(settings.NODES_XC)
     for node in nodes:
-        name = node.xpath(name_path)[0].strip()
-        address = node.xpath(address_path)[0].strip()
-        score = node.xpath(score_path)[0].strip()
-        comment = re.search('\d+', node.xpath(comment_path)[0].strip()).group()
-        detail_url = domain + node.xpath(detail_url_path)[0].strip()
+        name = node.xpath(settings.NAME_XC)[0].strip()
+        address = node.xpath(settings.ADDRESS_XC)[0].strip()
+        grade = node.xpath(settings.SCORE_XC)[0].strip()
+        comment = re.search('\d+', node.xpath(settings.COMMENT_XC)[0].strip()).group()
+        url = detail_url = settings.DOMAIN_XC + node.xpath(settings.DETAIL_XC)[0].strip()
+        intro, website, contact = get_detail(detail_url)
+        params = dict(
+            name=name.encode('utf-8'),
+            address=address.encode('utf-8'),
+            grade=float(grade.encode('utf-8')),
+            comment=comment.encode('utf-8'),
+            url=url.encode('utf-8'),
+            intro=intro.encode('utf-8'),
+            website=website.encode('utf-8'),
+            contact=contact.encode('utf-8'),
+
+        )
         print name
-        print address
-        print score
-        print comment
-        print detail_url
-        get_detail(detail_url)
-        print "============"
+        common.MY_DB.insert(settings.QUERY_XC, params)
 
 
 def get_detail(url):
-    rsp = requests.get(url=url, headers=settings.HEADER).text
+    rsp = requests.get(url=url, headers=common.HEADER).text
     selector = etree.HTML(rsp)
-    introduce = selector.xpath("//div[@class='text_style']/text()")[0].strip()
-    website = selector.xpath("//a[@class='breakurl']/@href")
+    introduce = selector.xpath(settings.INTRODUCE_XC)[0].strip()
+    website = selector.xpath(settings.WEBSITE_XC)
     website = website[0].strip() if website else ""
-    phone = selector.xpath("//ul[@class='s_sight_in_list']//li[1]//span[@class='s_sight_con']/text()")
-    phone = phone[0].strip() if phone else ""
-    print introduce
-    print website
+    phone = selector.xpath(settings.PHONE_XC)
+    if phone:
+        for content in phone:
+            content = content.strip()
+            if re.search('\d', content):
+                phone = content
+                break
+    else:
+        phone = ''
     print phone
+    return introduce, website, phone
 
 
 def main():
-    page_path = "//b[@class='numpage']"
-    rsp = requests.get(url=settings.SCENE_XC_URL, headers=settings.HEADER).text
+    rsp = requests.get(url=settings.SCENE_XC_URL, headers=common.HEADER).text
     selector = etree.HTML(rsp)
-    pages = selector.xpath(page_path)[0].strip
+    pages = selector.xpath(settings.NUM_PAGE)[0].strip()
+    scene_url = settings.SCENE_XC_URL[0:-5]
+    # for i in xrange(1, int(pages) + 1):
+    for i in xrange(10):
+        raw_url = '%s/s0-p%s.html' % (scene_url, str(i))
+        print raw_url
+        xc_scene(raw_url)
 
 
 if __name__ == '__main__':
-    xc_scene()
+    main()

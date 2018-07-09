@@ -1,33 +1,30 @@
 # coding: utf-8
-# import MySQLdb
-#
-#
-# class DB(object):
-#     def __init__(self):
-#         self.connection = MySQLdb.connect(host='localhost', port=3306, db='test', user='root', passwd='mysql',
-#                                           charset='utf8mb4')
-#         self.cursor = self.connection.cursor()
-#
-#     @staticmethod
-#     def instance():
-#         if not hasattr(DB, "_instance"):
-#             DB._instance = DB()
-#         return DB._instance
-#
-#     def insert(self, query, param):
-#         self.cursor.execute(query, param)
-#         self.connection.commit()
-#
-#     def close(self):
-#         self.cursor.close()
-#
-#
-# MY_DB = DB.instance()
+import MySQLdb
 
-# 景点来源
-SCENE_XC_URL = "http://you.ctrip.com/sight/shanghai2.html"
-SCENE_QNE_URL = "http://travel.qunar.com/p-cs299878-shanghai-jingdian"
-SCENE_MFW_URL = "http://www.mafengwo.cn/jd/10099/gonglve.html"
+
+class DB(object):
+    def __init__(self):
+        self.connection = MySQLdb.connect(host='localhost', port=3306, db='wbb', user='root', passwd='mysql',
+                                          charset='utf8mb4')
+        self.cursor = self.connection.cursor()
+
+    @staticmethod
+    def instance():
+        if not hasattr(DB, "_instance"):
+            DB._instance = DB()
+        return DB._instance
+
+    def insert(self, query, param):
+        self.cursor.execute(query, param)
+        self.connection.commit()
+
+    def close(self):
+        self.cursor.close()
+
+
+MY_DB = DB.instance()
+
+
 
 # 美食点来源
 FOOD_XC_URL = "http://you.ctrip.com/restaurantlist/shanghai2.html"
