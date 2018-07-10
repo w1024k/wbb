@@ -5,6 +5,10 @@ from lxml import etree
 import scene_settings as settings
 import common
 import re
+import gevent
+from gevent import monkey
+
+monkey.patch_all()
 
 
 def xc_scene(url):
@@ -50,10 +54,15 @@ def main():
     selector = etree.HTML(rsp)
     pages = selector.xpath(settings.NUM_PAGE)[0].strip()
     scene_url = settings.SCENE_XC_URL[0:-5]
+    handler_list = []
     for i in xrange(1, int(pages) + 1):
         raw_url = '%s/s0-p%s.html' % (scene_url, str(i))
         print raw_url
-        xc_scene(raw_url)
+        handler_list.append(gevent.spawn(xc_scene, raw_url))
+        while len(handler_list) > 20:
+            # xc_scene(raw_url)
+            gevent.joinall(handler_list)
+            handler_list = []
 
 
 if __name__ == '__main__':
