@@ -39,15 +39,8 @@ def get_detail(url):
     introduce = selector.xpath(settings.INTRODUCE_XC)[0].strip()
     website = selector.xpath(settings.WEBSITE_XC)
     website = website[0].strip() if website else ""
-    phone = selector.xpath(settings.PHONE_XC)
-    if phone:
-        for content in phone:
-            content = content.strip()
-            if re.search('\d', content):
-                phone = content
-                break
-    else:
-        phone = ''
+    phone = filter(lambda x: re.search('\d', x), selector.xpath(settings.PHONE_XC))
+    phone = phone[0].strip() if phone else ''
     print phone
     return introduce, website, phone
 
