@@ -36,12 +36,12 @@ def xc_scene(url):
 def get_detail(url):
     rsp = requests.get(url=url, headers=common.HEADER).text
     selector = etree.HTML(rsp)
-    introduce = selector.xpath(settings.INTRODUCE_XC)[0].strip()
+    introduce = selector.xpath(settings.INTRODUCE_XC)
+    introduce = introduce[0].strip() if introduce else ''
     website = selector.xpath(settings.WEBSITE_XC)
     website = website[0].strip() if website else ""
     phone = filter(lambda x: re.search('\d', x), selector.xpath(settings.PHONE_XC))
     phone = phone[0].strip() if phone else ''
-    print phone
     return introduce, website, phone
 
 
@@ -50,8 +50,7 @@ def main():
     selector = etree.HTML(rsp)
     pages = selector.xpath(settings.NUM_PAGE)[0].strip()
     scene_url = settings.SCENE_XC_URL[0:-5]
-    # for i in xrange(1, int(pages) + 1):
-    for i in xrange(10):
+    for i in xrange(1, int(pages) + 1):
         raw_url = '%s/s0-p%s.html' % (scene_url, str(i))
         print raw_url
         xc_scene(raw_url)
