@@ -1,5 +1,9 @@
 # coding: utf-8
 import MySQLdb
+import gevent
+from gevent import monkey
+
+monkey.patch_all()
 
 
 class DB(object):
@@ -24,6 +28,19 @@ class DB(object):
 
 MY_DB = DB.instance()
 
+
+def xpath_handler(data):
+    data = data[0].strip() if data else ''
+    return data
+
+
+def gevent_download(urls, func):
+    handler_list = []
+    for url in urls:
+        handler_list.append(gevent.spawn(func, url))
+        while len(handler_list) > 30:
+            gevent.joinall(handler_list)
+            handler_list = []
 
 
 # 美食点来源

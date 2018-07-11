@@ -40,3 +40,11 @@ QUERY_XC = """insert into xc_scenic(
                     %(website)s,
                     %(contact)s)
             """
+
+# 去哪儿
+
+DOMAIN_QNE = "http://travel.qunar.com/"
+NODES_QNE = "//ul[@class='list_item clrfix']//li//a[@class='titlink']/@href"
+NAME_QNE = "//h1[@class='tit']/text()"
+ADDRESS_PHONE_QNE = "//td[@class='td_l']//dd/span"
+COORD = "//div[@class='mapbox']/@latlng"
