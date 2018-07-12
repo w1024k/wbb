@@ -26,11 +26,11 @@ class DB(object):
         self.cursor.close()
 
 
-MY_DB = DB.instance()
+# MY_DB = DB.instance()
 
 
-def xpath_handler(data):
-    data = data[0].strip() if data else ''
+def xpath_handler(data, default_val=''):
+    data = data[0].strip() if data else default_val
     return data
 
 
