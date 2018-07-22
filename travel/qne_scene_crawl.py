@@ -94,9 +94,6 @@ def url_product():
 
 
 def main():
-    # proxy = PROXY_TOOL.review_proxy()
-    # for url in url_product():
-    # qne_scene(url=url)
     gevent_download(urls=url_product(), func=qne_scene)
 
 
@@ -109,6 +106,8 @@ def get_proxy():
 
 
 if __name__ == '__main__':
+    # 先调main生成redis记录
+    # main()
     rows = MY_DB.select('select url from qne_url')
     urls = []
     for row in rows:
@@ -124,10 +123,3 @@ if __name__ == '__main__':
         t.join(10)
         print 'kill ..'
         t.terminate()
-
-        # gevent_download(urls=urls, func=get_detail)
-
-
-
-        # for url in url_product():
-        #     qne_scene(url)
