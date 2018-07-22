@@ -2,7 +2,7 @@
 
 import requests
 from lxml import etree
-import scene_settings as settings
+import settings
 from common import xpath_handler, gevent_download, HEADER, MY_DB
 import re
 
